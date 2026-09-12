@@ -1,14 +1,24 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const BASEURL=import.meta.env.VITE_API_URL;
+  const [loading, setLoading] = useState(false);
+
+  const BASEURL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = (e) => {
-
     e.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
 
     const data = {
       username: username,
@@ -22,74 +32,98 @@ function Login() {
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
-      .then((result) => {
+      .then(async (response) => {
+        const result = await response.json();
 
-        console.log(result);
-
-        if (result.access) {
-
-          localStorage.setItem("access", result.access);
-          localStorage.setItem("refresh", result.refresh);
-
-          alert("Login successful");
-
-        } else {
-
-          alert("Invalid username or password");
-
+        if (!response.ok) {
+          throw new Error(
+            result.message || "Invalid username or password"
+          );
         }
 
+        return result;
+      })
+      .then((result) => {
+        // Save JWT tokens
+        localStorage.setItem("access", result.access);
+        localStorage.setItem("refresh", result.refresh);
+
+        // Save username
+        localStorage.setItem("username", username);
+
+        // Check where user came from
+        const from = location.state?.from || "/";
+
+        // Go to previous requested page
+        navigate(from, { replace: true });
       })
       .catch((error) => {
         console.log(error);
+        alert(error.message);
+        setLoading(false);
       });
   };
 
   return (
-    <section className="bg-[#0F0F0F] min-h-screen py-20 text-white">
+    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-6">
 
-      <div className="max-w-md mx-auto px-6">
+      <div className="w-full max-w-md">
 
-        <h1 className="text-4xl font-bold text-center">
+        <h1 className="text-4xl font-bold text-center mb-8">
           Login
         </h1>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-[#1A1A1A] p-6 rounded-xl mt-8"
+          className="bg-gray-900 border border-gray-800 rounded-xl p-8"
         >
 
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          />
+          {/* Username */}
+          <div className="mb-5">
+            <label className="block text-sm text-gray-300 mb-2">
+              Username
+            </label>
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          />
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter username"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-white text-black outline-none"
+            />
+          </div>
 
+          {/* Password */}
+          <div className="mb-6">
+            <label className="block text-sm text-gray-300 mb-2">
+              Password
+            </label>
+
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              required
+              className="w-full px-4 py-3 rounded-lg bg-white text-black outline-none"
+            />
+          </div>
+
+          {/* Login Button */}
           <button
             type="submit"
-            className="w-full bg-[#C89B3C] text-black py-3 rounded font-semibold"
+            disabled={loading}
+            className="w-full bg-yellow-600 hover:bg-yellow-500 text-black py-3 rounded-lg font-semibold"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
         </form>
 
       </div>
 
-    </section>
+    </div>
   );
 }
 

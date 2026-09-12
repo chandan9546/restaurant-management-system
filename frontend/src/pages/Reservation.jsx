@@ -3,22 +3,35 @@ import { useNavigate } from "react-router-dom";
 
 function Reservation() {
   const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [guests, setGuests] = useState("");
   const [loading, setLoading] = useState(false);
-  const BASEURL=import.meta.env.VITE_API_URL;
+
+  const BASEURL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-     if (loading) {
-    return;
-  }
+    const token = localStorage.getItem("access");
 
-  setLoading(true);
+    if (!token) {
+      navigate("/login", {
+        state: {
+          from: "/reservation",
+        },
+      });
+      return;
+    }
+
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
 
     const data = {
       name: name,
@@ -32,12 +45,20 @@ function Reservation() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Reservation failed");
+        }
+
+        return response.json();
+      })
       .then((result) => {
         console.log(result);
+
         navigate("/reservation-success");
       })
       .catch((error) => {
@@ -48,66 +69,100 @@ function Reservation() {
   };
 
   return (
-    <section className="bg-[#0F0F0F] min-h-screen py-20 text-white">
-      <div className="max-w-2xl mx-auto px-6">
-
-        <h1 className="text-4xl font-bold text-center">
-          Book a Table
-        </h1>
+    <div className="min-h-screen bg-gray-950 text-white px-6 py-10">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold text-center mb-8">Book Your Table</h1>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-[#1A1A1A] p-6 rounded-xl mt-10"
+          className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-5"
         >
-          <input
-            type="text"
-            placeholder="Your Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          />
+          {/* Name */}
 
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          />
+          <div>
+            <label className="block mb-2 text-gray-300">Name</label>
 
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          />
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              required
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500"
+            />
+          </div>
 
-          <input
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          />
+          {/* Phone */}
 
-          <input
-            type="number"
-            placeholder="Number of Guests"
-            value={guests}
-            onChange={(e) => setGuests(e.target.value)}
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          />
+          <div>
+            <label className="block mb-2 text-gray-300">Phone</label>
+
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Enter your phone number"
+              required
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500"
+            />
+          </div>
+
+          {/* Date */}
+
+          <div>
+            <label className="block mb-2 text-gray-300">Date</label>
+
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500"
+            />
+          </div>
+
+          {/* Time */}
+
+          <div>
+            <label className="block mb-2 text-gray-300">Time</label>
+
+            <input
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+              required
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500"
+            />
+          </div>
+
+          {/* Guests */}
+
+          <div>
+            <label className="block mb-2 text-gray-300">Number of Guests</label>
+
+            <input
+              type="number"
+              min="1"
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              placeholder="Enter number of guests"
+              required
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500"
+            />
+          </div>
+
+          {/* Submit */}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#C89B3C] text-black py-3 rounded font-semibold"
+            className="w-full bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 text-black font-semibold py-3 rounded-lg"
           >
             {loading ? "Booking..." : "Book Table"}
           </button>
         </form>
-
       </div>
-    </section>
+    </div>
   );
 }
 

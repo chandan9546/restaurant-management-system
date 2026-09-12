@@ -1,13 +1,39 @@
 from django.urls import path
-from .views import( hello_api,menu_list,menu_detail, create_reservation,create_order,register_user,login_user,profile)
+
+from .views import (
+    hello_api,
+    menu_list,
+    menu_detail,
+    create_reservation,
+    create_order,
+    register_user,
+    login_user,
+    profile,
+    my_orders,
+    my_reservations,
+    review_list,
+    create_review,
+)
+
 
 urlpatterns = [
     path("hello/", hello_api),
+
     path("menu/", menu_list),
     path("menu/<int:item_id>/", menu_detail),
+
     path("reservations/", create_reservation),
+
     path("orders/", create_order),
+
     path("register/", register_user),
     path("login/", login_user),
+
     path("profile/", profile),
+    path("my-orders/", my_orders),
+    
+    path("my-reservations/", my_reservations),
+    
+    path("reviews/", review_list),
+    path("reviews/create/", create_review),
 ]

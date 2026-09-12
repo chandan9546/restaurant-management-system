@@ -29,6 +29,8 @@ function Cart({ cart, setCart }) {
     0,
   );
 
+  const finalTotal = totalPrice.toFixed(2);
+
   return (
     <section className="bg-[#0F0F0F] min-h-screen py-20 text-white">
       <div className="max-w-5xl mx-auto px-6">
@@ -68,7 +70,7 @@ function Cart({ cart, setCart }) {
                 </div>
 
                 <p className="text-[#C89B3C] font-semibold">
-                  ₹{Number(item.price) * item.quantity}
+                  ₹{(Number(item.price) * item.quantity).toFixed(2)}
                 </p>
 
                 <button
@@ -83,9 +85,10 @@ function Cart({ cart, setCart }) {
             <div className="bg-[#1A1A1A] p-6 rounded-xl mt-8 text-right">
               <p className="text-gray-400">Total Amount</p>
 
-              <h2 className="text-3xl font-bold text-[#C89B3C] mt-2">
-                ₹{totalPrice}
-              </h2>
+              
+                <h2 className="text-3xl font-bold text-[#C89B3C] mt-2">
+                  ₹{finalTotal}
+                </h2>
 
               <button
                 onClick={() => navigate("/checkout")}

@@ -1,16 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
-function Checkout({ cart,setCart  }) {
-
+function Checkout({ cart, setCart }) {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const BASEURL=import.meta.env.VITE_API_URL;
 
+  const BASEURL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const token = localStorage.getItem("access");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    fetch(`${BASEURL}/api/profile/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setName(data.username);
+        setPhone(data.phone);
+        setAddress(data.address);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [BASEURL, navigate]);
 
   const totalPrice = cart.reduce(
     (total, item) =>
@@ -18,17 +41,16 @@ function Checkout({ cart,setCart  }) {
     0
   );
 
+  const finalTotal = totalPrice.toFixed(2);
 
   const handleSubmit = (e) => {
-
     e.preventDefault();
-
 
     const orderData = {
       name: name,
       phone: phone,
       address: address,
-      total_amount: totalPrice,
+      total_amount: finalTotal,
 
       items: cart.map((item) => ({
         id: item.id,
@@ -37,62 +59,47 @@ function Checkout({ cart,setCart  }) {
       })),
     };
 
-
     fetch(`${BASEURL}/api/orders/`, {
       method: "POST",
 
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("access")}`,
       },
 
       body: JSON.stringify(orderData),
     })
       .then((response) => response.json())
-
       .then((result) => {
-
         console.log(result);
 
         if (result.order_id) {
-            setCart([]);
+          setCart([]);
 
           alert("Order placed successfully");
 
           navigate("/");
-
         } else {
-
           alert("Order failed");
-
         }
-
       })
-
       .catch((error) => {
-
         console.log(error);
 
         alert("Something went wrong");
-
       });
-
   };
-
 
   return (
     <section className="bg-[#0F0F0F] min-h-screen py-20 text-white">
-
       <div className="max-w-5xl mx-auto px-6">
 
         <h1 className="text-4xl font-bold text-center">
           Checkout
         </h1>
 
-
         <form onSubmit={handleSubmit}>
-
           <div className="grid md:grid-cols-2 gap-8 mt-10">
-
 
             {/* Customer Details */}
 
@@ -101,7 +108,6 @@ function Checkout({ cart,setCart  }) {
               <h2 className="text-2xl font-semibold mb-6">
                 Customer Details
               </h2>
-
 
               <input
                 type="text"
@@ -112,7 +118,6 @@ function Checkout({ cart,setCart  }) {
                 className="w-full p-3 mb-4 bg-white text-black rounded"
               />
 
-
               <input
                 type="text"
                 placeholder="Phone Number"
@@ -121,7 +126,6 @@ function Checkout({ cart,setCart  }) {
                 required
                 className="w-full p-3 mb-4 bg-white text-black rounded"
               />
-
 
               <textarea
                 placeholder="Delivery Address"
@@ -134,7 +138,6 @@ function Checkout({ cart,setCart  }) {
 
             </div>
 
-
             {/* Order Summary */}
 
             <div className="bg-[#1A1A1A] p-6 rounded-xl">
@@ -143,35 +146,26 @@ function Checkout({ cart,setCart  }) {
                 Order Summary
               </h2>
 
-
               {cart.map((item) => (
-
                 <div
                   key={item.id}
                   className="flex justify-between border-b border-gray-700 py-3"
                 >
-
                   <div>
-
-                    <p>
-                      {item.name}
-                    </p>
+                    <p>{item.name}</p>
 
                     <p className="text-gray-400 text-sm">
                       ₹{item.price} × {item.quantity}
                     </p>
-
                   </div>
 
-
                   <p className="text-[#C89B3C]">
-                    ₹{Number(item.price) * item.quantity}
+                    ₹{(
+                      Number(item.price) * item.quantity
+                    ).toFixed(2)}
                   </p>
-
                 </div>
-
               ))}
-
 
               <div className="flex justify-between mt-6">
 
@@ -180,11 +174,10 @@ function Checkout({ cart,setCart  }) {
                 </p>
 
                 <p className="text-2xl font-bold text-[#C89B3C]">
-                  ₹{totalPrice}
+                  ₹{finalTotal}
                 </p>
 
               </div>
-
 
               <button
                 type="submit"
@@ -196,14 +189,11 @@ function Checkout({ cart,setCart  }) {
             </div>
 
           </div>
-
         </form>
 
       </div>
-
     </section>
   );
 }
-
 
 export default Checkout;

@@ -1,19 +1,27 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+
 from django.contrib.auth.models import User
-
-from .models import MenuItem, Reservation, OrderItem
-
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+
+from .models import (
+    MenuItem,
+    Reservation,
+    Order,
+    OrderItem,
+    UserProfile,
+     Review
+)
 
 from .serializers import (
     MenuItemSerializer,
     ReservationSerializer,
     OrderSerializer,
-    RegisterSerializer
+    RegisterSerializer,
+    ReviewSerializer
 )
 
 
@@ -28,7 +36,10 @@ def hello_api(request):
 def menu_list(request):
     menu_items = MenuItem.objects.all()
 
-    serializer = MenuItemSerializer(menu_items, many=True)
+    serializer = MenuItemSerializer(
+        menu_items,
+        many=True
+    )
 
     return Response(serializer.data)
 
@@ -37,6 +48,7 @@ def menu_list(request):
 def menu_detail(request, item_id):
     try:
         menu_item = MenuItem.objects.get(id=item_id)
+
     except MenuItem.DoesNotExist:
         return Response(
             {"message": "Menu item not found"},
@@ -49,21 +61,29 @@ def menu_detail(request, item_id):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def create_reservation(request):
-    serializer = ReservationSerializer(data=request.data)
+
+    serializer = ReservationSerializer(
+        data=request.data
+    )
 
     if serializer.is_valid():
-        serializer.save()
+        serializer.save(user=request.user)
 
         return Response({
             "message": "Reservation booked successfully",
             "data": serializer.data
         }, status=201)
 
-    return Response(serializer.errors, status=400)
+    return Response(
+        serializer.errors,
+        status=400
+    )
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def create_order(request):
 
     order_data = {
@@ -73,11 +93,15 @@ def create_order(request):
         "total_amount": request.data.get("total_amount"),
     }
 
-    order_serializer = OrderSerializer(data=order_data)
+    order_serializer = OrderSerializer(
+        data=order_data
+    )
 
     if order_serializer.is_valid():
 
-        order = order_serializer.save()
+        order = order_serializer.save(
+            user=request.user
+        )
 
         items = request.data.get("items", [])
 
@@ -98,12 +122,14 @@ def create_order(request):
         order_serializer.errors,
         status=400
     )
-    
-    
+
+
 @api_view(["POST"])
 def register_user(request):
 
-    serializer = RegisterSerializer(data=request.data)
+    serializer = RegisterSerializer(
+        data=request.data
+    )
 
     if serializer.is_valid():
         serializer.save()
@@ -116,9 +142,8 @@ def register_user(request):
         serializer.errors,
         status=400
     )
-    
-    
-    
+
+
 @api_view(["POST"])
 def login_user(request):
 
@@ -143,15 +168,90 @@ def login_user(request):
     return Response({
         "message": "Invalid username or password"
     }, status=401)
-    
-    
-    
 
-    
+
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def profile(request):
+
+    profile, created = UserProfile.objects.get_or_create(
+        user=request.user
+    )
 
     return Response({
         "username": request.user.username,
+        "phone": profile.phone,
+        "address": profile.address,
         "message": "Welcome to your profile"
     })
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_orders(request):
+
+    orders = Order.objects.filter(
+        user=request.user
+    ).order_by("-created_at")
+
+    serializer = OrderSerializer(
+        orders,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_reservations(request):
+
+    reservations = Reservation.objects.filter(
+        user=request.user
+    ).order_by("-created_at")
+
+    serializer = ReservationSerializer(
+        reservations,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+
+@api_view(["GET"])
+def review_list(request):
+
+    reviews = Review.objects.all().order_by("-created_at")
+
+    serializer = ReviewSerializer(
+        reviews,
+        many=True
+    )
+
+    return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_review(request):
+
+    serializer = ReviewSerializer(
+        data=request.data
+    )
+
+    if serializer.is_valid():
+
+        serializer.save(
+            user=request.user
+        )
+
+        return Response({
+            "message": "Review submitted successfully",
+            "data": serializer.data
+        }, status=201)
+
+    return Response(
+        serializer.errors,
+        status=400
+    )
