@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 
 function Menu() {
   const [menuItems, setMenuItems] = useState([]);
+  const BASEURL=import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/menu/")
+    fetch(`${BASEURL}/api/menu/`)
       .then((response) => response.json())
       .then((data) => {
         setMenuItems(data);

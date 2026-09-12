@@ -57,16 +57,12 @@ def __str__(self):
     
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
-        related_name="items"
-    )
+    order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name="items")
     menu_item = models.ForeignKey(
         MenuItem,
         on_delete=models.CASCADE
     )
-    quantity = models.PositiveIntegerField()
+    quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):

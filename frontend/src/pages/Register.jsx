@@ -4,6 +4,7 @@ function Register() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const BASEURL=import.meta.env.VITE_API_URL;
 
   const handleSubmit = (e) => {
 
@@ -14,7 +15,7 @@ function Register() {
       password: password,
     };
 
-    fetch("http://127.0.0.1:8000/api/register/", {
+    fetch(`${BASEURL}/api/register/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

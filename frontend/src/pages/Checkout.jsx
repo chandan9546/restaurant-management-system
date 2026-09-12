@@ -9,6 +9,7 @@ function Checkout({ cart,setCart  }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const BASEURL=import.meta.env.VITE_API_URL;
 
 
   const totalPrice = cart.reduce(
@@ -37,7 +38,7 @@ function Checkout({ cart,setCart  }) {
     };
 
 
-    fetch("http://127.0.0.1:8000/api/orders/", {
+    fetch(`${BASEURL}/api/orders/`, {
       method: "POST",
 
       headers: {

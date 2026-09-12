@@ -5,9 +5,10 @@ function MenuDetails({ addToCart }) {
   const { itemId } = useParams();
 
   const [item, setItem] = useState(null);
+  const BASEURL=import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/api/menu/${itemId}/`)
+    fetch(`${BASEURL}/api/menu/${itemId}/`)
       .then((response) => response.json())
       .then((data) => {
         setItem(data);
