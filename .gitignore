@@ -22,3 +22,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+
+backend/.env
+frontend/.env
+backend/venv/
