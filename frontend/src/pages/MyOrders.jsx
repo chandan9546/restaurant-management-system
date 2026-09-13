@@ -40,6 +40,46 @@ function MyOrders() {
       });
   }, [BASEURL, navigate]);
 
+  // Cancel Order
+  const handleCancelOrder = (orderId) => {
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this order?"
+    );
+
+    if (!confirmCancel) {
+      return;
+    }
+
+    const token = localStorage.getItem("access");
+
+    fetch(`${BASEURL}/api/orders/${orderId}/cancel/`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert(data.message);
+
+        if (data.status === "cancelled") {
+          setOrders(
+            orders.map((order) =>
+              order.id === orderId
+                ? {
+                    ...order,
+                    status: "cancelled",
+                  }
+                : order
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
@@ -152,6 +192,21 @@ function MyOrders() {
                   </p>
 
                 </div>
+
+                {/* Cancel Order */}
+
+                {order.status !== "cancelled" &&
+                  order.status !== "completed" && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCancelOrder(order.id);
+                      }}
+                      className="mt-4 bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg"
+                    >
+                      Cancel Order
+                    </button>
+                  )}
 
                 {/* View Details */}
 

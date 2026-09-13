@@ -71,7 +71,7 @@ function Footer() {
 
             <div className="space-y-3 text-gray-400">
               <p>📍 Noida, Uttar Pradesh</p>
-              <p>📞 +91 98765 43210</p>
+              <p>📞 +91 9546473288</p>
               <p>✉️ royalrasoi@example.com</p>
             </div>
 
@@ -101,7 +101,6 @@ function Footer() {
 
         </div>
 
-        {/* Copyright */}
         <div className="border-t border-gray-800 mt-10 pt-6 text-center">
           <p className="text-gray-500 text-sm">
             © 2026 Royal Rasoi. All rights reserved.

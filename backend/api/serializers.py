@@ -64,6 +64,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "address",
             "total_amount",
             "status",
+            "cancelled_by",
             "created_at",
             "items"
         ]

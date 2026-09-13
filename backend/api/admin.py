@@ -84,11 +84,14 @@ class OrderAdmin(admin.ModelAdmin):
         "phone",
         "total_amount",
         "status",
+        "cancelled_by",
+        "cancelled_at",
         "created_at"
     ]
 
     list_filter = [
         "status",
+        "cancelled_by",
         "created_at"
     ]
 
@@ -104,12 +107,58 @@ class OrderAdmin(admin.ModelAdmin):
 
     readonly_fields = [
         "user",
-        "created_at"
+        "created_at",
+        "cancelled_by",
+        "cancelled_at"
     ]
 
     inlines = [
         OrderItemInline
     ]
+
+    def get_readonly_fields(self, request, obj=None):
+
+        fields = list(self.readonly_fields)
+
+        # Cancelled order ka status change nahi hoga
+        if obj and obj.status == "cancelled":
+            fields.append("status")
+
+        return fields
+
+    def save_model(self, request, obj, form, change):
+
+        # Existing cancelled order ko
+        # dobara confirmed/completed nahi hone denge
+        if change:
+
+            old_order = Order.objects.get(
+                id=obj.id
+            )
+
+            if old_order.status == "cancelled":
+
+                obj.status = "cancelled"
+                obj.cancelled_by = old_order.cancelled_by
+                obj.cancelled_at = old_order.cancelled_at
+
+        # Agar Admin kisi order ko manually cancel karta hai
+        if obj.status == "cancelled":
+
+            if not obj.cancelled_by:
+                obj.cancelled_by = "admin"
+
+            if not obj.cancelled_at:
+                from django.utils import timezone
+
+                obj.cancelled_at = timezone.now()
+
+        super().save_model(
+            request,
+            obj,
+            form,
+            change
+        )
 
 
 @admin.register(OrderItem)
@@ -126,8 +175,8 @@ class OrderItemAdmin(admin.ModelAdmin):
     search_fields = [
         "menu_item__name"
     ]
-    
-    
+
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
 

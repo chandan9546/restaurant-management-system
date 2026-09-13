@@ -4,6 +4,8 @@ from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
+from django.utils import timezone
+
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 
@@ -13,7 +15,7 @@ from .models import (
     Order,
     OrderItem,
     UserProfile,
-     Review
+    Review
 )
 
 from .serializers import (
@@ -50,10 +52,9 @@ def menu_detail(request, item_id):
         menu_item = MenuItem.objects.get(id=item_id)
 
     except MenuItem.DoesNotExist:
-        return Response(
-            {"message": "Menu item not found"},
-            status=404
-        )
+        return Response({
+            "message": "Menu item not found"
+        }, status=404)
 
     serializer = MenuItemSerializer(menu_item)
 
@@ -69,7 +70,10 @@ def create_reservation(request):
     )
 
     if serializer.is_valid():
-        serializer.save(user=request.user)
+
+        serializer.save(
+            user=request.user
+        )
 
         return Response({
             "message": "Reservation booked successfully",
@@ -106,6 +110,7 @@ def create_order(request):
         items = request.data.get("items", [])
 
         for item in items:
+
             OrderItem.objects.create(
                 order=order,
                 menu_item_id=item["id"],
@@ -132,6 +137,7 @@ def register_user(request):
     )
 
     if serializer.is_valid():
+
         serializer.save()
 
         return Response({
@@ -202,7 +208,6 @@ def my_orders(request):
     return Response(serializer.data)
 
 
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def my_reservations(request):
@@ -222,7 +227,9 @@ def my_reservations(request):
 @api_view(["GET"])
 def review_list(request):
 
-    reviews = Review.objects.all().order_by("-created_at")
+    reviews = Review.objects.all().order_by(
+        "-created_at"
+    )
 
     serializer = ReviewSerializer(
         reviews,
@@ -255,3 +262,50 @@ def create_review(request):
         serializer.errors,
         status=400
     )
+
+
+# Cancel Order
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def cancel_order(request, order_id):
+
+    try:
+        order = Order.objects.get(
+            id=order_id,
+            user=request.user
+        )
+
+    except Order.DoesNotExist:
+        return Response({
+            "message": "Order not found"
+        }, status=404)
+
+    # Already cancelled
+    if order.status == "cancelled":
+
+        return Response({
+            "message": "Order is already cancelled",
+            "status": "cancelled",
+            "cancelled_by": order.cancelled_by
+        }, status=400)
+
+    # Completed order cannot be cancelled
+    if order.status == "completed":
+
+        return Response({
+            "message": "Completed order cannot be cancelled"
+        }, status=400)
+
+    # Cancel order
+    order.status = "cancelled"
+    order.cancelled_by = "customer"
+    order.cancelled_at = timezone.now()
+
+    order.save()
+
+    return Response({
+        "message": "Order cancelled successfully",
+        "status": order.status,
+        "cancelled_by": order.cancelled_by,
+        "cancelled_at": order.cancelled_at
+    })
