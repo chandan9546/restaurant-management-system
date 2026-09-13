@@ -43,22 +43,76 @@ class ReservationAdmin(admin.ModelAdmin):
         "date",
         "time",
         "guests",
-        "status"
+        "status",
+        "cancelled_by",
+        "cancelled_at",
     ]
 
     list_filter = [
         "status",
-        "date"
+        "cancelled_by",
+        "date",
     ]
 
     search_fields = [
         "name",
-        "phone"
+        "phone",
+        "user__username",
     ]
 
     ordering = [
         "-created_at"
     ]
+
+    readonly_fields = [
+        "user",
+        "created_at",
+        "cancelled_by",
+        "cancelled_at",
+    ]
+
+    def get_readonly_fields(self, request, obj=None):
+
+        fields = list(self.readonly_fields)
+
+        if obj and obj.status == "cancelled":
+            fields.append("status")
+
+        return fields
+
+    def save_model(self, request, obj, form, change):
+
+        if change:
+
+            old_reservation = Reservation.objects.get(
+                id=obj.id
+            )
+
+            # Cancelled reservation ko dobara
+            # confirmed/completed nahi hone denge
+            if old_reservation.status == "cancelled":
+
+                obj.status = "cancelled"
+                obj.cancelled_by = old_reservation.cancelled_by
+                obj.cancelled_at = old_reservation.cancelled_at
+
+        # Admin manually reservation cancel kare
+        if obj.status == "cancelled":
+
+            if not obj.cancelled_by:
+                obj.cancelled_by = "admin"
+
+            if not obj.cancelled_at:
+                from django.utils import timezone
+
+                obj.cancelled_at = timezone.now()
+
+        super().save_model(
+            request,
+            obj,
+            form,
+            change
+        )
 
 
 class OrderItemInline(admin.TabularInline):

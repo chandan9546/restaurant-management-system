@@ -14,6 +14,7 @@ from .views import (
     review_list,
     create_review,
     cancel_order,
+    cancel_reservation,
 )
 
 
@@ -24,6 +25,7 @@ urlpatterns = [
     path("menu/<int:item_id>/", menu_detail),
 
     path("reservations/", create_reservation),
+    path("reservations/<int:reservation_id>/cancel/",cancel_reservation),
 
     path("orders/", create_order),
 

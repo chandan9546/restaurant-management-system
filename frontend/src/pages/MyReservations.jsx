@@ -40,6 +40,51 @@ function MyReservations() {
       });
   }, [BASEURL, navigate]);
 
+  // Cancel Reservation
+  const handleCancelReservation = (reservationId) => {
+    const confirmCancel = window.confirm(
+      "Are you sure you want to cancel this reservation?"
+    );
+
+    if (!confirmCancel) {
+      return;
+    }
+
+    const token = localStorage.getItem("access");
+
+    fetch(
+      `${BASEURL}/api/reservations/${reservationId}/cancel/`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        alert(data.message);
+
+        if (data.status === "cancelled") {
+          setReservations(
+            reservations.map((reservation) =>
+              reservation.id === reservationId
+                ? {
+                    ...reservation,
+                    status: "cancelled",
+                    cancelled_by: "customer",
+                    cancelled_at: data.cancelled_at,
+                  }
+                : reservation
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
@@ -161,6 +206,50 @@ function MyReservations() {
                   </div>
 
                 </div>
+
+                {/* Cancellation Information */}
+
+                {reservation.status === "cancelled" && (
+                  <div className="mt-5 bg-red-950 border border-red-800 rounded-lg p-4">
+
+                    <p className="text-red-400 font-semibold">
+                      Reservation Cancelled
+                    </p>
+
+                    <p className="text-gray-300 text-sm mt-2">
+                      Cancelled By:{" "}
+                      <span className="capitalize">
+                        {reservation.cancelled_by || "Customer"}
+                      </span>
+                    </p>
+
+                    {reservation.cancelled_at && (
+                      <p className="text-gray-400 text-sm mt-1">
+                        Cancelled At:{" "}
+                        {new Date(
+                          reservation.cancelled_at
+                        ).toLocaleString()}
+                      </p>
+                    )}
+
+                  </div>
+                )}
+
+                {/* Cancel Reservation Button */}
+
+                {reservation.status !== "cancelled" &&
+                  reservation.status !== "completed" && (
+                    <button
+                      onClick={() =>
+                        handleCancelReservation(
+                          reservation.id
+                        )
+                      }
+                      className="mt-5 bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg font-semibold"
+                    >
+                      Cancel Reservation
+                    </button>
+                  )}
 
               </div>
             ))}

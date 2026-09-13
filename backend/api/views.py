@@ -26,6 +26,9 @@ from .serializers import (
     ReviewSerializer
 )
 
+from django.utils import timezone
+from django.conf import settings
+
 
 @api_view(["GET"])
 def hello_api(request):
@@ -65,6 +68,52 @@ def menu_detail(request, item_id):
 @permission_classes([IsAuthenticated])
 def create_reservation(request):
 
+    date = request.data.get("date")
+    time = request.data.get("time")
+    guests = request.data.get("guests")
+
+    # Basic validation
+    if not date or not time or not guests:
+        return Response({
+            "message": "Date, time and guests are required."
+        }, status=400)
+
+    try:
+        guests = int(guests)
+    except (TypeError, ValueError):
+        return Response({
+            "message": "Number of guests must be a valid number."
+        }, status=400)
+
+    if guests < 1:
+        return Response({
+            "message": "Number of guests must be at least 1."
+        }, status=400)
+
+    # Restaurant capacity check
+    existing_reservations = Reservation.objects.filter(
+        date=date,
+        time=time
+    ).exclude(
+        status="cancelled"
+    )
+
+    booked_guests = sum(
+        reservation.guests
+        for reservation in existing_reservations
+    )
+
+    available_guests = settings.RESTAURANT_CAPACITY - booked_guests
+
+    if guests > available_guests:
+        return Response({
+            "message": (
+                f"Only {available_guests} guest(s) "
+                f"capacity is available for this time."
+            )
+        }, status=400)
+
+    # Create reservation
     serializer = ReservationSerializer(
         data=request.data
     )
@@ -84,6 +133,46 @@ def create_reservation(request):
         serializer.errors,
         status=400
     )
+    
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def cancel_reservation(request, reservation_id):
+
+    try:
+        reservation = Reservation.objects.get(
+            id=reservation_id,
+            user=request.user
+        )
+
+    except Reservation.DoesNotExist:
+        return Response({
+            "message": "Reservation not found"
+        }, status=404)
+
+    if reservation.status == "cancelled":
+        return Response({
+            "message": "Reservation is already cancelled",
+            "status": "cancelled",
+            "cancelled_by": reservation.cancelled_by
+        }, status=400)
+
+    if reservation.status == "completed":
+        return Response({
+            "message": "Completed reservation cannot be cancelled"
+        }, status=400)
+
+    reservation.status = "cancelled"
+    reservation.cancelled_by = "customer"
+    reservation.cancelled_at = timezone.now()
+
+    reservation.save()
+
+    return Response({
+        "message": "Reservation cancelled successfully",
+        "status": reservation.status,
+        "cancelled_by": reservation.cancelled_by,
+        "cancelled_at": reservation.cancelled_at
+    })
 
 
 @api_view(["POST"])

@@ -28,6 +28,11 @@ class Reservation(models.Model):
         ("cancelled", "Cancelled"),
     ]
 
+    CANCELLED_BY_CHOICES = [
+        ("customer", "Customer"),
+        ("admin", "Admin"),
+    ]
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -35,17 +40,34 @@ class Reservation(models.Model):
         null=True,
         blank=True
     )
+
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=12)
     date = models.DateField()
     time = models.TimeField()
     guests = models.IntegerField()
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default="pending"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+
+    cancelled_by = models.CharField(
+        max_length=20,
+        choices=CANCELLED_BY_CHOICES,
+        null=True,
+        blank=True
+    )
+
+    cancelled_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return f"{self.name} - {self.date}"

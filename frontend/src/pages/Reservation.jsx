@@ -31,6 +31,11 @@ function Reservation() {
       return;
     }
 
+    if (Number(guests) > 20) {
+      alert("Maximum 20 guests are allowed.");
+      return;
+    }
+
     setLoading(true);
 
     const data = {
@@ -49,12 +54,16 @@ function Reservation() {
       },
       body: JSON.stringify(data),
     })
-      .then((response) => {
+      .then(async (response) => {
+        const result = await response.json();
+
         if (!response.ok) {
-          throw new Error("Reservation failed");
+          throw new Error(
+            result.message || "Reservation failed"
+          );
         }
 
-        return response.json();
+        return result;
       })
       .then((result) => {
         console.log(result);
@@ -63,7 +72,7 @@ function Reservation() {
       })
       .catch((error) => {
         console.log(error);
-        alert("Something went wrong");
+        alert(error.message);
         setLoading(false);
       });
   };
@@ -71,16 +80,22 @@ function Reservation() {
   return (
     <div className="min-h-screen bg-gray-950 text-white px-6 py-10">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-center mb-8">Book Your Table</h1>
+
+        <h1 className="text-3xl font-bold text-center mb-8">
+          Book Your Table
+        </h1>
 
         <form
           onSubmit={handleSubmit}
           className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-5"
         >
+
           {/* Name */}
 
           <div>
-            <label className="block mb-2 text-gray-300">Name</label>
+            <label className="block mb-2 text-gray-300">
+              Name
+            </label>
 
             <input
               type="text"
@@ -95,7 +110,9 @@ function Reservation() {
           {/* Phone */}
 
           <div>
-            <label className="block mb-2 text-gray-300">Phone</label>
+            <label className="block mb-2 text-gray-300">
+              Phone
+            </label>
 
             <input
               type="tel"
@@ -110,7 +127,9 @@ function Reservation() {
           {/* Date */}
 
           <div>
-            <label className="block mb-2 text-gray-300">Date</label>
+            <label className="block mb-2 text-gray-300">
+              Date
+            </label>
 
             <input
               type="date"
@@ -124,7 +143,9 @@ function Reservation() {
           {/* Time */}
 
           <div>
-            <label className="block mb-2 text-gray-300">Time</label>
+            <label className="block mb-2 text-gray-300">
+              Time
+            </label>
 
             <input
               type="time"
@@ -138,11 +159,14 @@ function Reservation() {
           {/* Guests */}
 
           <div>
-            <label className="block mb-2 text-gray-300">Number of Guests</label>
+            <label className="block mb-2 text-gray-300">
+              Number of Guests
+            </label>
 
             <input
               type="number"
               min="1"
+              max="20"
               value={guests}
               onChange={(e) => setGuests(e.target.value)}
               placeholder="Enter number of guests"
@@ -160,6 +184,7 @@ function Reservation() {
           >
             {loading ? "Booking..." : "Book Table"}
           </button>
+
         </form>
       </div>
     </div>
