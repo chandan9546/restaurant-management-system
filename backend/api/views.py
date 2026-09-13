@@ -28,6 +28,7 @@ from .serializers import (
 
 from django.utils import timezone
 from django.conf import settings
+from django.db.models import Sum
 
 
 @api_view(["GET"])
@@ -241,28 +242,26 @@ def register_user(request):
 
 @api_view(["POST"])
 def login_user(request):
-
     username = request.data.get("username")
     password = request.data.get("password")
 
-    user = authenticate(
-        username=username,
-        password=password
-    )
+    user = authenticate(username=username, password=password)
 
-    if user is not None:
+    if user is None:
+        return Response(
+            {"message": "Invalid username or password"},
+            status=401
+        )
 
-        refresh = RefreshToken.for_user(user)
-
-        return Response({
-            "message": "Login successful",
-            "access": str(refresh.access_token),
-            "refresh": str(refresh)
-        })
+    refresh = RefreshToken.for_user(user)
 
     return Response({
-        "message": "Invalid username or password"
-    }, status=401)
+        "message": "Login successful",
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+        "username": user.username,
+        "is_staff": user.is_staff
+    })
 
 
 @api_view(["GET"])
@@ -398,3 +397,147 @@ def cancel_order(request, order_id):
         "cancelled_by": order.cancelled_by,
         "cancelled_at": order.cancelled_at
     })
+    
+    
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def admin_dashboard(request):
+
+    # Only admin/staff users can access
+    if not request.user.is_staff:
+        return Response({
+            "message": "You are not authorized to access this dashboard."
+        }, status=403)
+
+    total_orders = Order.objects.count()
+
+    pending_orders = Order.objects.filter(
+        status="pending"
+    ).count()
+
+    confirmed_orders = Order.objects.filter(
+        status="confirmed"
+    ).count()
+
+    completed_orders = Order.objects.filter(
+        status="completed"
+    ).count()
+
+    cancelled_orders = Order.objects.filter(
+        status="cancelled"
+    ).count()
+
+    total_reservations = Reservation.objects.count()
+
+    pending_reservations = Reservation.objects.filter(
+        status="pending"
+    ).count()
+
+    confirmed_reservations = Reservation.objects.filter(
+        status="confirmed"
+    ).count()
+
+    completed_reservations = Reservation.objects.filter(
+        status="completed"
+    ).count()
+
+    cancelled_reservations = Reservation.objects.filter(
+        status="cancelled"
+    ).count()
+
+    total_revenue = Order.objects.filter(
+        status__in=["confirmed", "completed"]
+    ).aggregate(
+        total=Sum("total_amount")
+    )["total"] or 0
+
+    return Response({
+        "orders": {
+            "total": total_orders,
+            "pending": pending_orders,
+            "confirmed": confirmed_orders,
+            "completed": completed_orders,
+            "cancelled": cancelled_orders,
+        },
+
+        "reservations": {
+            "total": total_reservations,
+            "pending": pending_reservations,
+            "confirmed": confirmed_reservations,
+            "completed": completed_reservations,
+            "cancelled": cancelled_reservations,
+        },
+
+        "revenue": total_revenue,
+    })
+    
+    
+    
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def admin_menu(request):
+    if not request.user.is_staff:
+        return Response(
+            {"message": "You are not authorized to manage menu."},
+            status=403
+        )
+
+    if request.method == "GET":
+        menu_items = MenuItem.objects.all().order_by("id")
+        serializer = MenuItemSerializer(menu_items, many=True)
+        return Response(serializer.data)
+
+    serializer = MenuItemSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(
+            {
+                "message": "Menu item added successfully.",
+                "data": serializer.data
+            },
+            status=201
+        )
+
+    return Response(serializer.errors, status=400)
+
+
+@api_view(["PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
+def admin_menu_detail(request, item_id):
+    if not request.user.is_staff:
+        return Response(
+            {"message": "You are not authorized to manage menu."},
+            status=403
+        )
+
+    try:
+        menu_item = MenuItem.objects.get(id=item_id)
+    except MenuItem.DoesNotExist:
+        return Response(
+            {"message": "Menu item not found."},
+            status=404
+        )
+
+    if request.method == "PUT":
+        serializer = MenuItemSerializer(
+            menu_item,
+            data=request.data
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": "Menu item updated successfully.",
+                    "data": serializer.data
+                }
+            )
+
+        return Response(serializer.errors, status=400)
+
+    menu_item.delete()
+
+    return Response(
+        {"message": "Menu item deleted successfully."}
+    )

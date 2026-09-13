@@ -180,7 +180,7 @@ function Reservation() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 text-black font-semibold py-3 rounded-lg"
+            className="w-full bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 text-black font-semibold py-3 rounded-lg cursor-pointer"
           >
             {loading ? "Booking..." : "Book Table"}
           </button>

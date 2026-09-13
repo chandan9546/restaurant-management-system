@@ -50,6 +50,8 @@ function Login() {
 
         // Save username
         localStorage.setItem("username", username);
+         // check is user or staf
+        localStorage.setItem("is_staff", result.is_staff);
 
         // Check where user came from
         const from = location.state?.from || "/";

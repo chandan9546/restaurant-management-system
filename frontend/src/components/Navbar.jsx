@@ -4,11 +4,13 @@ function Navbar({ cart, setCart }) {
   const location = useLocation();
 
   const token = localStorage.getItem("access");
+  const isStaff = localStorage.getItem("is_staff") === "true";
 
   const handleLogout = () => {
     localStorage.removeItem("access");
     localStorage.removeItem("refresh");
     localStorage.removeItem("username");
+    localStorage.removeItem("is_staff");
 
     setCart([]);
 
@@ -24,115 +26,143 @@ function Navbar({ cart, setCart }) {
           Royal Rasoi
         </h1>
 
-        {/* Navigation Links */}
+        {/* Navigation */}
         <div className="flex gap-6 items-center">
 
-          <Link
-            to="/"
-            className="hover:text-yellow-400"
-          >
-            Home
-          </Link>
-
-          <Link
-            to="/menu"
-            className="hover:text-yellow-400"
-          >
-            Menu
-          </Link>
-
-          <Link
-            to="/about"
-            className="hover:text-yellow-400"
-          >
-            About
-          </Link>
-
-          <Link
-            to="/contact"
-            className="hover:text-yellow-400"
-          >
-            Contact
-          </Link>
-
-          <Link
-            to="/reviews"
-            className="hover:text-yellow-400"
-          >
-            Reviews
-          </Link>
-
-          <Link
-            to="/reservation"
-            className="hover:text-yellow-400"
-          >
-            Book Table
-          </Link>
-
-          {/* Cart */}
-          <Link
-            to="/cart"
-            className="relative hover:text-yellow-400"
-          >
-            Cart
-
-            {cart.length > 0 && (
-              <span className="absolute -top-3 -right-4 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                {cart.reduce(
-                  (total, item) => total + item.quantity,
-                  0
-                )}
-              </span>
-            )}
-          </Link>
-
-          {/* Logged In User */}
-          {token ? (
+          {token && isStaff ? (
+            /* ================= ADMIN NAVBAR ================= */
             <>
               <Link
-                to="/my-reservations"
-                className="hover:text-yellow-400"
+                to="/admin-dashboard"
+                className="text-yellow-400 hover:text-yellow-300"
               >
-                My Reservations
+                Admin Dashboard
               </Link>
 
               <Link
-                to="/my-orders"
-                className="hover:text-yellow-400"
+                to="/admin-menu"
+                className="text-yellow-400 hover:text-yellow-300"
               >
-                My Orders
-              </Link>
-
-              <Link
-                to="/profile"
-                className="hover:text-yellow-400"
-              >
-                Profile
+                Manage Menu
               </Link>
 
               <button
                 onClick={handleLogout}
-                className="text-red-400 hover:text-red-300"
+                className="text-red-400 hover:text-red-300 "
               >
                 Logout
               </button>
             </>
           ) : (
+            /* ================= CUSTOMER / PUBLIC NAVBAR ================= */
             <>
-              {/* Logged Out User */}
               <Link
-                to="/login"
+                to="/"
                 className="hover:text-yellow-400"
               >
-                Login
+                Home
               </Link>
 
               <Link
-                to="/register"
+                to="/menu"
                 className="hover:text-yellow-400"
               >
-                Register
+                Menu
               </Link>
+
+              <Link
+                to="/about"
+                className="hover:text-yellow-400"
+              >
+                About
+              </Link>
+
+              <Link
+                to="/contact"
+                className="hover:text-yellow-400"
+              >
+                Contact
+              </Link>
+
+              <Link
+                to="/reviews"
+                className="hover:text-yellow-400"
+              >
+                Reviews
+              </Link>
+
+              <Link
+                to="/reservation"
+                className="hover:text-yellow-400"
+              >
+                Book Table
+              </Link>
+
+              {/* Cart */}
+              <Link
+                to="/cart"
+                className="relative hover:text-yellow-400"
+              >
+                Cart
+
+                {cart.length > 0 && (
+                  <span className="absolute -top-3 -right-4 bg-red-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                    {cart.reduce(
+                      (total, item) =>
+                        total + item.quantity,
+                      0
+                    )}
+                  </span>
+                )}
+              </Link>
+
+              {token ? (
+                <>
+                  <Link
+                    to="/my-reservations"
+                    className="hover:text-yellow-400"
+                  >
+                    My Reservations
+                  </Link>
+
+                  <Link
+                    to="/my-orders"
+                    className="hover:text-yellow-400"
+                  >
+                    My Orders
+                  </Link>
+
+                  <Link
+                    to="/profile"
+                    className="hover:text-yellow-400"
+                  >
+                    Profile
+                  </Link>
+
+                  <button
+                    onClick={handleLogout}
+                    className="text-red-400 hover:text-red-300 cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="hover:text-yellow-400"
+                  >
+                    Login
+                  </Link>
+
+                  <Link
+                    to="/register"
+                    className="hover:text-yellow-400"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
             </>
           )}
 

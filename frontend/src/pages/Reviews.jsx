@@ -136,7 +136,7 @@ function Reviews() {
 
             <button
               type="submit"
-              className="bg-yellow-600 hover:bg-yellow-500 text-black font-semibold px-6 py-3 rounded-lg"
+              className="bg-yellow-600 hover:bg-yellow-500 text-black font-semibold px-6 py-3 rounded-lg cursor-pointer"
             >
               Submit Review
             </button>

@@ -3,26 +3,38 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+
 import Menu from "./pages/Menu";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Home from "./pages/Home";
 import MenuDetails from "./pages/MenuDetails";
+
 import Reservation from "./pages/Reservation";
 import ReservationSuccess from "./pages/ReservationSuccess";
+
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+
 import ProtectedRoute from "./components/ProtectedRoute";
+
 import Profile from "./pages/Profile";
 import MyOrders from "./pages/MyOrders";
 import MyReservations from "./pages/MyReservations";
 import Reviews from "./pages/Reviews";
 import OrderDetails from "./pages/OrderDetails";
 
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminMenu from "./pages/AdminMenu";
+
+
 function App() {
+
   const [cart, setCart] = useState(() => {
+
     const username = localStorage.getItem("username");
 
     if (!username) {
@@ -34,18 +46,30 @@ function App() {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+
   useEffect(() => {
+
     const username = localStorage.getItem("username");
 
     if (username) {
-      localStorage.setItem(`cart_${username}`, JSON.stringify(cart));
+      localStorage.setItem(
+        `cart_${username}`,
+        JSON.stringify(cart)
+      );
     }
+
   }, [cart]);
 
+
   const addToCart = (item) => {
-    const existingItem = cart.find((cartItem) => cartItem.id === item.id);
+
+    const existingItem = cart.find(
+      (cartItem) => cartItem.id === item.id
+    );
+
 
     if (existingItem) {
+
       setCart(
         cart.map((cartItem) =>
           cartItem.id === item.id
@@ -53,10 +77,12 @@ function App() {
                 ...cartItem,
                 quantity: cartItem.quantity + 1,
               }
-            : cartItem,
-        ),
+            : cartItem
+        )
       );
+
     } else {
+
       setCart([
         ...cart,
         {
@@ -64,42 +90,111 @@ function App() {
           quantity: 1,
         },
       ]);
+
     }
   };
 
+
   return (
     <BrowserRouter>
-      <Navbar cart={cart} setCart={setCart} />
+
+      <Navbar
+        cart={cart}
+        setCart={setCart}
+      />
+
 
       <Routes>
-        <Route path="/" element={<Home />} />
 
-        <Route path="/menu" element={<Menu />} />
+        {/* Home */}
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
+
+        {/* Menu */}
+        <Route
+          path="/menu"
+          element={<Menu />}
+        />
 
         <Route
           path="/menu/:itemId"
-          element={<MenuDetails addToCart={addToCart} />}
+          element={
+            <MenuDetails
+              addToCart={addToCart}
+            />
+          }
         />
 
-        <Route path="/about" element={<About />} />
 
-        <Route path="/contact" element={<Contact />} />
-
-        <Route path="/cart" element={<Cart cart={cart} setCart={setCart} />} />
+        {/* Other Pages */}
+        <Route
+          path="/about"
+          element={<About />}
+        />
 
         <Route
-          path="/checkout"
-          element={<Checkout cart={cart} setCart={setCart} />}
+          path="/contact"
+          element={<Contact />}
         />
 
-        <Route path="/reservation" element={<Reservation />} />
+        <Route
+          path="/reviews"
+          element={<Reviews />}
+        />
 
-        <Route path="/reservation-success" element={<ReservationSuccess />} />
 
-        <Route path="/register" element={<Register />} />
+        {/* Cart */}
+        <Route
+          path="/cart"
+          element={
+            <Cart
+              cart={cart}
+              setCart={setCart}
+            />
+          }
+        />
 
-        <Route path="/login" element={<Login />} />
 
+        {/* Checkout */}
+        <Route
+          path="/checkout"
+          element={
+            <Checkout
+              cart={cart}
+              setCart={setCart}
+            />
+          }
+        />
+
+
+        {/* Reservation */}
+        <Route
+          path="/reservation"
+          element={<Reservation />}
+        />
+
+        <Route
+          path="/reservation-success"
+          element={<ReservationSuccess />}
+        />
+
+
+        {/* Authentication */}
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+
+        {/* Profile */}
         <Route
           path="/profile"
           element={
@@ -109,6 +204,8 @@ function App() {
           }
         />
 
+
+        {/* My Orders */}
         <Route
           path="/my-orders"
           element={
@@ -118,6 +215,19 @@ function App() {
           }
         />
 
+
+        {/* Order Details */}
+        <Route
+          path="/my-orders/:orderId"
+          element={
+            <ProtectedRoute>
+              <OrderDetails />
+            </ProtectedRoute>
+          }
+        />
+
+
+        {/* My Reservations */}
         <Route
           path="/my-reservations"
           element={
@@ -127,21 +237,36 @@ function App() {
           }
         />
 
-        <Route path="/reviews" element={<Reviews />} />
 
+        {/* Admin Dashboard */}
         <Route
-          path="/my-orders/:orderId"
+          path="/admin-dashboard"
           element={
             <ProtectedRoute>
-              <OrderDetails />
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />
+
+
+        {/* Admin Menu Management */}
+        <Route
+          path="/admin-menu"
+          element={
+            <ProtectedRoute>
+              <AdminMenu />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
 
+
       <Footer />
+
     </BrowserRouter>
   );
 }
+
 
 export default App;

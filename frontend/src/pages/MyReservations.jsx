@@ -245,7 +245,7 @@ function MyReservations() {
                           reservation.id
                         )
                       }
-                      className="mt-5 bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg font-semibold"
+                      className="mt-5 bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg font-semibold cursor-pointer"
                     >
                       Cancel Reservation
                     </button>
