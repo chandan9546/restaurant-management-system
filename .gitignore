@@ -1,10 +1,12 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyo
 
 # Django
 venv/
 *.sqlite3
+staticfiles/
 
 # Environment variables
 .env
@@ -23,7 +25,9 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Virtual environment
+backend/venv/
 
+# Environment files
 backend/.env
 frontend/.env
-backend/venv/
