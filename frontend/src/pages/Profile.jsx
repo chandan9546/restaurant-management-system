@@ -92,7 +92,7 @@ function Profile() {
               Address
             </p>
 
-            <p className="text-lg sm:text-xl font-semibold mt-1 break-words">
+            <p className="text-lg sm:text-xl font-semibold mt-1 wrap-break-words">
               {user.address}
             </p>
           </div>
