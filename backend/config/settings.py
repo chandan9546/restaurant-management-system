@@ -151,6 +151,7 @@ MAILERS = {
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://restaurant-management-system-pink-sigma.vercel.app",
 ]
 
 
