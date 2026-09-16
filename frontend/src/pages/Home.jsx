@@ -5,31 +5,33 @@ import biryani from "../assets/biryani.jpg";
 import paneer from "../assets/paneer.jpg";
 import butterChicken from "../assets/butter-chicken.jpg";
 
-const Home=()=> {
+const Home = () => {
   return (
     <main>
       <Hero />
 
-      <section className="bg-[#0F0F0F] py-20">
-        <div className="max-w-6xl mx-auto px-6">
+      <section className="bg-[#0F0F0F] py-12 sm:py-16 md:py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
           {/* Section Heading */}
           <div className="text-center">
-            <p className="text-[#C89B3C] uppercase text-sm">
+
+            <p className="text-[#C89B3C] uppercase text-xs sm:text-sm">
               Our Special
             </p>
 
-            <h2 className="text-4xl font-bold text-white mt-2">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mt-2">
               Popular Dishes
             </h2>
 
-            <p className="text-gray-400 mt-4">
+            <p className="text-gray-400 mt-4 text-sm sm:text-base max-w-xl mx-auto">
               Taste some of our most loved Indian dishes.
             </p>
+
           </div>
 
           {/* Food Cards */}
-          <div className="mt-10 grid md:grid-cols-3 gap-6">
+          <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
             <FoodCard
               name="Chicken Biryani"
@@ -55,16 +57,20 @@ const Home=()=> {
           </div>
 
           {/* View Menu Button */}
-          <div className="text-center mt-10">
-            <button className="border border-[#C89B3C] text-[#C89B3C] px-6 py-3 rounded-md">
+          <div className="text-center mt-8 sm:mt-10">
+
+            <button
+              className="border border-[#C89B3C] text-[#C89B3C] px-6 py-3 rounded-md cursor-pointer hover:bg-[#C89B3C] hover:text-black transition"
+            >
               View Full Menu
             </button>
+
           </div>
 
         </div>
       </section>
     </main>
   );
-}
+};
 
 export default Home;

@@ -38,8 +38,8 @@ function Profile() {
 
   if (error) {
     return (
-      <section className="bg-[#0F0F0F] min-h-screen text-white flex items-center justify-center">
-        <p className="text-red-400">{error}</p>
+      <section className="bg-[#0F0F0F] min-h-screen text-white flex items-center justify-center px-4">
+        <p className="text-red-400 text-center">{error}</p>
       </section>
     );
   }
@@ -53,32 +53,46 @@ function Profile() {
   }
 
   return (
-    <section className="bg-[#0F0F0F] min-h-screen py-20 text-white">
-      <div className="max-w-md mx-auto px-6">
+    <section className="bg-[#0F0F0F] min-h-screen py-12 sm:py-16 md:py-20 text-white">
+      <div className="max-w-md mx-auto px-4 sm:px-6">
 
-        <h1 className="text-4xl font-bold text-center">
+        {/* Heading */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-center">
           My Profile
         </h1>
 
-        <div className="bg-[#1A1A1A] p-6 rounded-xl mt-10">
+        {/* Profile Card */}
+        <div className="bg-[#1A1A1A] p-5 sm:p-6 rounded-xl mt-8 sm:mt-10">
 
+          {/* Username */}
           <div className="mb-5">
-            <p className="text-gray-400">Username</p>
-            <p className="text-xl font-semibold mt-1">
+            <p className="text-gray-400 text-sm">
+              Username
+            </p>
+
+            <p className="text-lg sm:text-xl font-semibold mt-1 break-words">
               {user.username}
             </p>
           </div>
 
+          {/* Phone */}
           <div className="mb-5">
-            <p className="text-gray-400">Phone</p>
-            <p className="text-xl font-semibold mt-1">
+            <p className="text-gray-400 text-sm">
+              Phone
+            </p>
+
+            <p className="text-lg sm:text-xl font-semibold mt-1 break-words">
               {user.phone}
             </p>
           </div>
 
+          {/* Address */}
           <div>
-            <p className="text-gray-400">Address</p>
-            <p className="text-xl font-semibold mt-1">
+            <p className="text-gray-400 text-sm">
+              Address
+            </p>
+
+            <p className="text-lg sm:text-xl font-semibold mt-1 break-words">
               {user.address}
             </p>
           </div>

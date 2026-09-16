@@ -91,21 +91,22 @@ function Checkout({ cart, setCart }) {
   };
 
   return (
-    <section className="bg-[#0F0F0F] min-h-screen py-20 text-white">
-      <div className="max-w-5xl mx-auto px-6">
+    <section className="bg-[#0F0F0F] min-h-screen py-12 sm:py-16 md:py-20 text-white">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
-        <h1 className="text-4xl font-bold text-center">
+        {/* Heading */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-center">
           Checkout
         </h1>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid md:grid-cols-2 gap-8 mt-10">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8 sm:mt-10">
 
             {/* Customer Details */}
+            <div className="bg-[#1A1A1A] p-4 sm:p-6 rounded-xl">
 
-            <div className="bg-[#1A1A1A] p-6 rounded-xl">
-
-              <h2 className="text-2xl font-semibold mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-5 sm:mb-6">
                 Customer Details
               </h2>
 
@@ -133,52 +134,57 @@ function Checkout({ cart, setCart }) {
                 onChange={(e) => setAddress(e.target.value)}
                 required
                 rows="4"
-                className="w-full p-3 mb-4 bg-white text-black rounded"
+                className="w-full p-3 mb-4 bg-white text-black rounded resize-none"
               />
 
             </div>
 
             {/* Order Summary */}
+            <div className="bg-[#1A1A1A] p-4 sm:p-6 rounded-xl">
 
-            <div className="bg-[#1A1A1A] p-6 rounded-xl">
-
-              <h2 className="text-2xl font-semibold mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-5 sm:mb-6">
                 Order Summary
               </h2>
 
               {cart.map((item) => (
                 <div
                   key={item.id}
-                  className="flex justify-between border-b border-gray-700 py-3"
+                  className="flex justify-between items-start gap-4 border-b border-gray-700 py-3"
                 >
-                  <div>
-                    <p>{item.name}</p>
 
-                    <p className="text-gray-400 text-sm">
+                  <div className="min-w-0">
+                    <p className="wrap-break-words">
+                      {item.name}
+                    </p>
+
+                    <p className="text-gray-400 text-sm mt-1">
                       ₹{item.price} × {item.quantity}
                     </p>
                   </div>
 
-                  <p className="text-[#C89B3C]">
+                  <p className="text-[#C89B3C] whitespace-nowrap">
                     ₹{(
                       Number(item.price) * item.quantity
                     ).toFixed(2)}
                   </p>
+
                 </div>
               ))}
 
-              <div className="flex justify-between mt-6">
+              {/* Total */}
+              <div className="flex justify-between items-center gap-4 mt-6">
 
-                <p className="text-xl font-semibold">
+                <p className="text-lg sm:text-xl font-semibold">
                   Total
                 </p>
 
-                <p className="text-2xl font-bold text-[#C89B3C]">
+                <p className="text-xl sm:text-2xl font-bold text-[#C89B3C] whitespace-nowrap">
                   ₹{finalTotal}
                 </p>
 
               </div>
 
+              {/* Place Order */}
               <button
                 type="submit"
                 className="w-full bg-[#C89B3C] text-black py-3 rounded-md mt-6 font-semibold cursor-pointer hover:bg-[#D9AF55] transition"
@@ -189,6 +195,7 @@ function Checkout({ cart, setCart }) {
             </div>
 
           </div>
+
         </form>
 
       </div>

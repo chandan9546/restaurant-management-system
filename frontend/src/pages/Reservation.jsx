@@ -78,20 +78,20 @@ function Reservation() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white px-6 py-10">
+    <div className="min-h-screen bg-gray-950 text-white px-4 sm:px-6 py-12 sm:py-16 md:py-20">
       <div className="max-w-2xl mx-auto">
 
-        <h1 className="text-3xl font-bold text-center mb-8">
+        {/* Heading */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8">
           Book Your Table
         </h1>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-5"
+          className="bg-gray-900 border border-gray-800 rounded-xl p-4 sm:p-6 space-y-5"
         >
 
           {/* Name */}
-
           <div>
             <label className="block mb-2 text-gray-300">
               Name
@@ -108,7 +108,6 @@ function Reservation() {
           </div>
 
           {/* Phone */}
-
           <div>
             <label className="block mb-2 text-gray-300">
               Phone
@@ -125,7 +124,6 @@ function Reservation() {
           </div>
 
           {/* Date */}
-
           <div>
             <label className="block mb-2 text-gray-300">
               Date
@@ -136,12 +134,11 @@ function Reservation() {
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500 cursor-pointer"
             />
           </div>
 
           {/* Time */}
-
           <div>
             <label className="block mb-2 text-gray-300">
               Time
@@ -152,12 +149,11 @@ function Reservation() {
               value={time}
               onChange={(e) => setTime(e.target.value)}
               required
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500"
+              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white outline-none focus:border-yellow-500 cursor-pointer"
             />
           </div>
 
           {/* Guests */}
-
           <div>
             <label className="block mb-2 text-gray-300">
               Number of Guests
@@ -176,11 +172,10 @@ function Reservation() {
           </div>
 
           {/* Submit */}
-
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 text-black font-semibold py-3 rounded-lg cursor-pointer"
+            className="w-full bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 text-black font-semibold py-3 rounded-lg cursor-pointer transition"
           >
             {loading ? "Booking..." : "Book Table"}
           </button>

@@ -50,7 +50,8 @@ function Login() {
 
         // Save username
         localStorage.setItem("username", username);
-         // check is user or staf
+
+        // Check if user is staff
         localStorage.setItem("is_staff", result.is_staff);
 
         // Check where user came from
@@ -67,21 +68,23 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-6">
+    <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center px-4 sm:px-6 py-10">
 
       <div className="w-full max-w-md">
 
-        <h1 className="text-4xl font-bold text-center mb-8">
+        {/* Heading */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-8">
           Login
         </h1>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-gray-900 border border-gray-800 rounded-xl p-8"
+          className="bg-gray-900 border border-gray-800 rounded-xl p-5 sm:p-8"
         >
 
           {/* Username */}
           <div className="mb-5">
+
             <label className="block text-sm text-gray-300 mb-2">
               Username
             </label>
@@ -92,12 +95,14 @@ function Login() {
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter username"
               required
-              className="w-full px-4 py-3 rounded-lg bg-white text-black outline-none"
+              className="w-full px-4 py-3 rounded-lg bg-white text-black outline-none focus:ring-2 focus:ring-yellow-500"
             />
+
           </div>
 
           {/* Password */}
           <div className="mb-6">
+
             <label className="block text-sm text-gray-300 mb-2">
               Password
             </label>
@@ -108,15 +113,16 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password"
               required
-              className="w-full px-4 py-3 rounded-lg bg-white text-black outline-none"
+              className="w-full px-4 py-3 rounded-lg bg-white text-black outline-none focus:ring-2 focus:ring-yellow-500"
             />
+
           </div>
 
           {/* Login Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-yellow-600 hover:bg-yellow-500 text-black py-3 rounded-lg font-semibold"
+            className="w-full bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 text-black py-3 rounded-lg font-semibold cursor-pointer transition"
           >
             {loading ? "Logging in..." : "Login"}
           </button>

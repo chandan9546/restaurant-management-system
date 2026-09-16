@@ -70,46 +70,57 @@ function Register() {
   };
 
   return (
-    <section className="bg-[#0F0F0F] min-h-screen py-20 text-white">
-      <div className="max-w-md mx-auto px-6">
+    <section className="bg-[#0F0F0F] min-h-screen py-12 sm:py-16 md:py-20 text-white">
+      <div className="max-w-md mx-auto px-4 sm:px-6">
 
-        <h1 className="text-4xl font-bold text-center">
+        {/* Heading */}
+        <h1 className="text-3xl sm:text-4xl font-bold text-center">
           Create Account
         </h1>
 
-        <p className="text-gray-400 text-center mt-3">
+        <p className="text-gray-400 text-center mt-3 text-sm sm:text-base">
           Register to order your favourite food.
         </p>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-[#1A1A1A] p-6 rounded-xl mt-10"
+          className="bg-[#1A1A1A] p-5 sm:p-6 rounded-xl mt-8 sm:mt-10"
         >
 
           {/* Username */}
-
           <input
             type="text"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className="w-full p-3 mb-4 bg-white text-black rounded"
+            className="w-full p-3 mb-4 bg-white text-black rounded outline-none"
           />
 
           {/* Password */}
-
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full p-3 mb-4 bg-white text-black rounded"
+            className="w-full p-3 bg-white text-black rounded outline-none"
           />
 
-          {/* Register Button */}
+          {/* Password Requirement Message */}
+          <div className="mt-3 mb-5 text-gray-400 text-xs sm:text-sm leading-6">
+            <p className="text-gray-300 font-medium mb-1">
+              Password must contain:
+            </p>
 
+            <p>• At least 8 characters</p>
+            <p>• One uppercase letter (A-Z)</p>
+            <p>• One lowercase letter (a-z)</p>
+            <p>• One number (0-9)</p>
+            <p>• One special character (@ # $ % & *)</p>
+          </div>
+
+          {/* Register Button */}
           <button
             type="submit"
             disabled={loading}
