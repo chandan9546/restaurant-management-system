@@ -1,21 +1,27 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const BASEURL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
+
     const data = {
       username: username,
       password: password,
-      phone: phone,
-      address: address,
     };
 
     fetch(`${BASEURL}/api/register/`, {
@@ -25,24 +31,41 @@ function Register() {
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
+      .then(async (response) => {
+        const result = await response.json();
+
+        if (!response.ok) {
+          const errorMessage = Object.entries(result)
+            .map(([field, errors]) => {
+              if (Array.isArray(errors)) {
+                return `${field}: ${errors.join(", ")}`;
+              }
+
+              return `${field}: ${errors}`;
+            })
+            .join("\n");
+
+          throw new Error(
+            errorMessage || "Registration failed"
+          );
+        }
+
+        return result;
+      })
       .then((result) => {
         console.log(result);
 
-        if (result.message) {
-          alert("Registration successful");
+        alert("Registration successful! Please login.");
 
-          setUsername("");
-          setPassword("");
-          setPhone("");
-          setAddress("");
-        } else {
-          alert("Registration failed");
-        }
+        setUsername("");
+        setPassword("");
+
+        navigate("/login");
       })
       .catch((error) => {
         console.log(error);
-        alert("Something went wrong");
+        alert(error.message);
+        setLoading(false);
       });
   };
 
@@ -63,6 +86,8 @@ function Register() {
           className="bg-[#1A1A1A] p-6 rounded-xl mt-10"
         >
 
+          {/* Username */}
+
           <input
             type="text"
             placeholder="Username"
@@ -71,6 +96,8 @@ function Register() {
             required
             className="w-full p-3 mb-4 bg-white text-black rounded"
           />
+
+          {/* Password */}
 
           <input
             type="password"
@@ -81,29 +108,14 @@ function Register() {
             className="w-full p-3 mb-4 bg-white text-black rounded"
           />
 
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          />
-
-          <textarea
-            placeholder="Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
-            rows="3"
-            className="w-full p-3 mb-4 bg-white text-black rounded"
-          ></textarea>
+          {/* Register Button */}
 
           <button
             type="submit"
-            className="w-full bg-[#C89B3C] text-black py-3 rounded-md font-semibold cursor-pointer hover:bg-[#D9AF55] transition"
+            disabled={loading}
+            className="w-full bg-[#C89B3C] text-black py-3 rounded-md font-semibold cursor-pointer hover:bg-[#D9AF55] disabled:bg-gray-600 transition"
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
 
         </form>
