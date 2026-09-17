@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Navbar({ cart, setCart }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Login ke baad route change hone par Navbar re-render hoga
+  useLocation();
 
   const token = localStorage.getItem("access");
   const isStaff = localStorage.getItem("is_staff") === "true";
@@ -174,7 +177,6 @@ function Navbar({ cart, setCart }) {
                 )}
               </>
             )}
-
           </div>
 
           {/* Mobile Menu Button */}
@@ -185,7 +187,6 @@ function Navbar({ cart, setCart }) {
           >
             {isMenuOpen ? "✕" : "☰"}
           </button>
-
         </div>
 
         {/* Mobile Navigation */}
@@ -343,10 +344,8 @@ function Navbar({ cart, setCart }) {
 
               </div>
             )}
-
           </div>
         )}
-
       </div>
     </nav>
   );
