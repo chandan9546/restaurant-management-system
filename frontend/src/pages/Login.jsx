@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-function Login() {
+const Login=()=> {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -37,7 +37,7 @@ function Login() {
 
         if (!response.ok) {
           throw new Error(
-            result.message || "Invalid username or password"
+            result.message || "Invalid username or password. If you don't have an account, please register first."
           );
         }
 
