@@ -1,21 +1,35 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-function Menu() {
+const Menu = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const BASEURL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
+    setLoading(true);
+    setError("");
+
     fetch(`${BASEURL}/api/menu/`)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to load menu");
+        }
+
+        return response.json();
+      })
       .then((data) => {
         setMenuItems(data);
+        setLoading(false);
       })
       .catch((error) => {
         console.log("Error:", error);
+        setError("Unable to load menu. Please try again.");
+        setLoading(false);
       });
   }, []);
 
@@ -126,53 +140,94 @@ function Menu() {
 
         </div>
 
-        {/* Food Cards */}
-        <div className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {/* Loading Skeleton */}
+        {loading && (
+          <div className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
-          {filteredItems.map((item) => (
-            <Link
-              to={`/menu/${item.id}`}
-              key={item.id}
-              className="cursor-pointer"
-            >
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div
+                key={item}
+                className="bg-[#1A1A1A] rounded-xl overflow-hidden animate-pulse"
+              >
 
-              <div className="bg-[#1A1A1A] rounded-xl overflow-hidden hover:scale-[1.02] sm:hover:scale-105 transition">
+                {/* Image Skeleton */}
+                <div className="w-full h-52 sm:h-56 bg-[#2A2A2A]"></div>
 
-                {/* Food Image */}
-                {item.image && (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-52 sm:h-56 object-cover"
-                  />
-                )}
-
-                {/* Food Details */}
+                {/* Text Skeleton */}
                 <div className="p-4 sm:p-5">
 
-                  <h3 className="text-lg sm:text-xl font-semibold">
-                    {item.name}
-                  </h3>
+                  <div className="h-5 bg-[#2A2A2A] rounded w-3/4"></div>
 
-                  <p className="text-gray-400 mt-2 text-sm sm:text-base">
-                    {item.description}
-                  </p>
+                  <div className="h-3 bg-[#2A2A2A] rounded w-full mt-4"></div>
 
-                  <p className="text-[#C89B3C] font-semibold mt-4">
-                    ₹{item.price}
-                  </p>
+                  <div className="h-3 bg-[#2A2A2A] rounded w-5/6 mt-2"></div>
+
+                  <div className="h-4 bg-[#2A2A2A] rounded w-1/4 mt-5"></div>
 
                 </div>
 
               </div>
+            ))}
 
-            </Link>
-          ))}
+          </div>
+        )}
 
-        </div>
+        {/* Error Message */}
+        {!loading && error && (
+          <p className="text-center text-red-400 mt-12">
+            {error}
+          </p>
+        )}
+
+        {/* Food Cards */}
+        {!loading && !error && (
+          <div className="mt-10 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
+            {filteredItems.map((item) => (
+              <Link
+                to={`/menu/${item.id}`}
+                key={item.id}
+                className="cursor-pointer"
+              >
+
+                <div className="bg-[#1A1A1A] rounded-xl overflow-hidden hover:scale-[1.02] sm:hover:scale-105 transition">
+
+                  {/* Food Image */}
+                  {item.image && (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-52 sm:h-56 object-cover"
+                    />
+                  )}
+
+                  {/* Food Details */}
+                  <div className="p-4 sm:p-5">
+
+                    <h3 className="text-lg sm:text-xl font-semibold">
+                      {item.name}
+                    </h3>
+
+                    <p className="text-gray-400 mt-2 text-sm sm:text-base">
+                      {item.description}
+                    </p>
+
+                    <p className="text-[#C89B3C] font-semibold mt-4">
+                      ₹{item.price}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </Link>
+            ))}
+
+          </div>
+        )}
 
         {/* No Result */}
-        {filteredItems.length === 0 && (
+        {!loading && !error && filteredItems.length === 0 && (
           <p className="text-center text-gray-400 mt-12">
             No food found.
           </p>
@@ -181,6 +236,6 @@ function Menu() {
       </div>
     </section>
   );
-}
+};
 
 export default Menu;
