@@ -92,7 +92,8 @@ Restaurant Management System
 │
 ├── backend/
 │   ├── manage.py
-│   ├── main/
+│   ├── api/
+|   ├── config/
 │   ├── db.sqlite3
 │   ├── requirements.txt
 │   └── ...
